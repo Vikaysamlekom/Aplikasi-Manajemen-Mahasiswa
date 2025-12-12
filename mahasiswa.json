@@ -1,0 +1,30 @@
+[
+    {
+        "nim": "241011400004",
+        "nama": "Acmad Refaldi Peto",
+        "kelas": "03TPLP001",
+        "ipk": 3.99,
+        "jurusan": "Teknik Informatika"
+    },
+    {
+        "nim": "241011400152",
+        "nama": "Adam Prammoedya Sudarmono Putra",
+        "kelas": "03TPLP001",
+        "ipk": 3.9,
+        "jurusan": "Teknik Informatika"
+    },
+    {
+        "nim": "241011401930",
+        "nama": "Ade Nova Fikriansyah",
+        "kelas": "03TPLP001",
+        "ipk": 3.83,
+        "jurusan": "Teknik Informatika"
+    },
+    {
+        "nim": "241011400053",
+        "nama": "Vickry Dwi Prasetyanto",
+        "kelas": "03TPLP001",
+        "ipk": 3.77,
+        "jurusan": "Teknik Informatika"
+    }
+]

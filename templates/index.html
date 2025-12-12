@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+    <h2>Daftar Mahasiswa</h2>
+</div>
+
+<!-- Search + Sort Form -->
+<form method="get" action="{{ url_for('index') }}" class="search-form-modern" style="margin-bottom:20px;">
+    <div class="search-grid" style="display:grid; grid-template-columns:2fr 1.2fr 1fr 1fr 1fr; gap:12px;">
+        <input type="text" name="q" placeholder="Cari NIM / Nama / Jurusan..." value="{{ q }}" style="padding:12px; border-radius:10px;">
+        <select name="jurusan" style="padding:12px; border-radius:10px;">
+            <option value="">Semua Jurusan</option>
+            {% for j in jurusan_list %}
+            <option value="{{ j }}" {% if jurusan_filter==j %}selected{% endif %}>{{ j }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="method" style="padding:12px; border-radius:10px;">
+            <option value="linear" {% if method=='linear' %}selected{% endif %}>Linear</option>
+            <option value="sequential" {% if method=='sequential' %}selected{% endif %}>Sequential</option>
+            <option value="binary" {% if method=='binary' %}selected{% endif %}>Binary</option>
+        </select>
+
+        <select name="sort_alg" style="padding:12px; border-radius:10px;">
+            <option value="" {% if not sort_alg %}selected{% endif %}>Default sort</option>
+            <option value="bubble" {% if sort_alg=='bubble' %}selected{% endif %}>Bubble</option>
+            <option value="insertion" {% if sort_alg=='insertion' %}selected{% endif %}>Insertion</option>
+            <option value="selection" {% if sort_alg=='selection' %}selected{% endif %}>Selection</option>
+        </select>
+
+        <div style="display:flex; gap:8px;">
+            <select name="sort_field" style="padding:12px; border-radius:10px;">
+                <option value="nama" {% if sort_field=='nama' %}selected{% endif %}>Nama</option>
+                <option value="nim" {% if sort_field=='nim' %}selected{% endif %}>NIM</option>
+                <option value="ipk" {% if sort_field=='ipk' %}selected{% endif %}>IPK</option>
+            </select>
+            <select name="order" style="padding:12px; border-radius:10px;">
+                <option value="asc" {% if order=='asc' %}selected{% endif %}>Asc</option>
+                <option value="desc" {% if order=='desc' %}selected{% endif %}>Desc</option>
+            </select>
+            <button class="btn-modern" type="submit" style="padding:12px 18px; border-radius:10px;">Cari</button>
+        </div>
+    </div>
+</form>
+
+{% if complexity_info %}
+<div style="background:#eef; padding:10px; margin:10px 0; border-left:4px solid #00f;">
+    <pre>{{ complexity_info }}</pre>
+</div>
+{% endif %}
+
+
+<!-- Table -->
+<div class="table-wrapper-modern" style="overflow:auto; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.06);">
+    <table class="modern-table" style="width:100%; min-width:800px; border-collapse:collapse;">
+        <thead>
+            <tr style="background:var(--primary); color:white;">
+                <th style="padding:12px;">NIM</th>
+                <th style="padding:12px;">Nama</th>
+                <th style="padding:12px;">Kelas</th>
+                <th style="padding:12px;">IPK</th>
+                <th style="padding:12px;">Jurusan</th>
+                <th style="padding:12px;">Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for m in data %}
+            <tr style="transition:0.2s;">
+                <td style="padding:12px;">{{ m.nim }}</td>
+                <td style="padding:12px;">{{ m.nama }}</td>
+                <td style="padding:12px;">{{ m.kelas }}</td>
+                <td style="padding:12px;">{{ '%.2f' % m.ipk }}</td>
+                <td style="padding:12px;">{{ m.jurusan }}</td>
+                <td style="padding:12px;">
+                    <a class="btn-edit" href="{{ url_for('edit', nim=m.nim) }}">Edit</a>
+                    <a class="btn-delete" href="{{ url_for('delete', nim=m.nim) }}" onclick="return confirm('Hapus data?')">Hapus</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" style="text-align:center; padding:20px;">Tidak ada data.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

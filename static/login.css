@@ -1,0 +1,67 @@
+/* Background gradient */
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: linear-gradient(135deg,
+                #4f7cff,
+                #844aff,
+                #ff68d9);
+    background-size: 300% 300%;
+    animation: gradientMove 10s ease infinite;
+    font-family: Arial, sans-serif;
+}
+
+/* Animasi background (biar hidup) */
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Card login */
+.container {
+    width: 400px;
+    padding: 30px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+/* Judul */
+h2 {
+    margin-bottom: 25px;
+}
+
+/* Input box */
+.input-box {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+
+    border: 1px solid #ccc;
+    border-radius: 10px; /* >>> ujung tumpul */
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+/* Tombol */
+.btn {
+    width: 100%;
+    padding: 12px;
+    background: #1877ff;
+    color: white;
+    border: none;
+    border-radius: 10px; /* tumpul */
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn:hover {
+    background: #0d5fd8;
+}

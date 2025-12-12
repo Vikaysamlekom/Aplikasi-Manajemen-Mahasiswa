@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Daftar Akun</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            background: linear-gradient(135deg, #ff6ec7, #845ec2, #3f72ff);
+            background-size: 300% 300%;
+            animation: gradmove 10s ease infinite;
+            font-family: Arial, sans-serif;
+        }
+
+        @keyframes gradmove {
+            0% { background-position: 0 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0 50%; }
+        }
+
+        .container {
+            width: 400px;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+            text-align: center;
+        }
+
+        .container h2 {
+            margin-bottom: 20px;
+        }
+
+        .input-box {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            border: 1px solid #ccc;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: #ff3e9d;
+            border-radius: 12px;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #df2b86;
+        }
+
+        .link {
+            margin-top: 10px;
+        }
+
+        .link a {
+            text-decoration: none;
+            color: #3f72ff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Daftar Akun Baru</h2>
+
+    <form action="/register" method="POST">
+        <input type="text" name="username" class="input-box" placeholder="Username" required>
+        <input type="password" name="password" class="input-box" placeholder="Password" required>
+
+        <button class="btn" type="submit">Buat Akun</button>
+
+        <div class="link">
+            Sudah punya akun? <a href="/login">Login</a>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

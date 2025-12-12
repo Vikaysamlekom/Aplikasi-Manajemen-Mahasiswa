@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="form-wrapper">
+    <h2>Tambah Mahasiswa</h2>
+
+    <form method="post">
+        <label>NIM (12 Digit)</label>
+        <input type="text" name="nim" maxlength="12" minlength="12" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
+
+        <label>Nama</label>
+        <input type="text" name="nama" required>
+
+        <label>Kelas</label>
+        <input type="text" name="kelas" placeholder="Kelas" required>
+
+        <label>IPK</label>
+        <input type="number" step="0.01" name="ipk" required>
+
+        <label>Jurusan</label>
+        <select name="jurusan" required>
+            <option value="">-- Pilih Jurusan --</option>
+            {% for j in jurusan_list %}
+            <option value="{{ j }}">{{ j }}</option>
+            {% endfor %}
+        </select>
+
+        <button class="btn" type="submit">Simpan</button>
+    </form>
+</div>
+
+{% endblock %}

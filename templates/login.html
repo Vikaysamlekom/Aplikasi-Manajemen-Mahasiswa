@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+
+    <style>
+        /* Fullscreen gradient background */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            background: linear-gradient(135deg, #4f7cff, #844aff, #ff68d9);
+            background-size: 300% 300%;
+            animation: gradientMove 10s ease infinite;
+            font-family: Arial, sans-serif;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Login card */
+        .container {
+            width: 400px;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+            text-align: center;
+        }
+
+        .container h2 {
+            margin-bottom: 25px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        /* Input fields */
+        .input-box {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 12px;
+            font-size: 16px;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        /* Button */
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: #1877ff;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 5px;
+        }
+
+        .btn:hover {
+            background: #0c5bd4;
+        }
+
+        /* Register link */
+        .register-text {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .register-text a {
+            color: #1877ff;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .register-text a:hover {
+            text-decoration: underline;
+        }
+    </style>
+
+</head>
+<body>
+
+<div class="container">
+    <h2>Login</h2>
+
+    <form action="/login" method="POST">
+        <input type="text" name="username" placeholder="Username" class="input-box" required>
+        <input type="password" name="password" placeholder="Password" class="input-box" required>
+        <button type="submit" class="btn">Masuk</button>
+    </form>
+
+    <p class="register-text">
+        Belum punya akun?  
+        <a href="/register">Daftar di sini</a>
+    </p>
+</div>
+
+</body>
+</html>
