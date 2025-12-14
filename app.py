@@ -3,14 +3,28 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import json, os, re
 from typing import List
 import time
+import os, json
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+USERS_FILE = os.path.join(BASE_DIR, "users.json")
+MAHASISWA_FILE = os.path.join(BASE_DIR, "mahasiswa.json")
+
+def load_json(path):
+    if not os.path.exists(path):
+        return []
+    with open(path, "r") as f:
+        return json.load(f)
+
+def save_json(path, data):
+    with open(path, "w") as f:
+        json.dump(data, f, indent=4)
 
 start = time.time()
 print(time.time() - start)
 
 app = Flask(__name__)
 app.secret_key = "super-secret-change-this"
-DATA_FILE = "mahasiswa.json"
-USERS_FILE = "users.json"
 
 # ---------- Data model ----------
 JURUSAN_LIST = [
@@ -76,9 +90,9 @@ def save_users(users):
         json.dump(users, f, indent=4, ensure_ascii=False)
 
 def load_data() -> List[Mahasiswa]:
-    if not os.path.exists(DATA_FILE):
+    if not os.path.exists(MAHASISWA_FILE):
         return []
-    with open(DATA_FILE, "r", encoding="utf-8") as f:
+    with open(MAHASISWA_FILE, "r", encoding="utf-8") as f:
         try:
             raw = json.load(f)
             return [Mahasiswa(m["nim"], m["nama"], m["kelas"], m["ipk"], m.get("jurusan","")) for m in raw]
@@ -86,7 +100,7 @@ def load_data() -> List[Mahasiswa]:
             return []
 
 def save_data(mahasiswa: List[Mahasiswa]):
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
+    with open(MAHASISWA_FILE, "w", encoding="utf-8") as f:
         json.dump([m.to_dict() for m in mahasiswa], f, indent=4, ensure_ascii=False)
 
 # Ensure default admin exists
@@ -342,8 +356,8 @@ def delete(nim):
 
 # ---------- RUN ----------
 if __name__ == "__main__":
-    if not os.path.exists(DATA_FILE):
-        with open(DATA_FILE, "w") as f:
+    if not os.path.exists(MAHASISWA_FILE):
+        with open(MAHASISWA_FILE, "w") as f:
             json.dump([], f)
     if not os.path.exists(USERS_FILE):
         save_users({"admin": generate_password_hash("12345")})
