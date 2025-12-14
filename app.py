@@ -1,11 +1,10 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 import json, os, re
-from typing import List, Optional
+from typing import List
 import time
 
 start = time.time()
-# kode lu...
 print(time.time() - start)
 
 app = Flask(__name__)
@@ -96,23 +95,21 @@ if "admin" not in users:
     users["admin"] = generate_password_hash("12345")
     save_users(users)
 
-# ---------- Simple user system ----------
+# ---------- Login required ----------
 def login_required(fn):
     from functools import wraps
     @wraps(fn)
     def wrapper(*args, **kwargs):
         if "user" not in session:
-            flash("Silakan login terlebih dahulu.", "error")
             return redirect(url_for("login"))
         return fn(*args, **kwargs)
     return wrapper
 
-# ---------- Search ---------- (operate on list[Mahasiswa])
+# ---------- Search ----------
 def search_students(arr: List[Mahasiswa], keyword: str):
     k = keyword.lower()
     return [m for m in arr if k in m.nim.lower() or k in m.nama.lower() or k in m.jurusan.lower()]
 
-# Binary search (returns list) - we search by nama/nim/jurusan substring after sorting by nama
 def binary_search(arr: List[Mahasiswa], keyword: str):
     keyword = keyword.lower()
     arr_sorted = sorted(arr, key=lambda x: x.nama.lower())
@@ -122,12 +119,11 @@ def binary_search(arr: List[Mahasiswa], keyword: str):
         mid = (left + right) // 2
         midval = arr_sorted[mid].nama.lower()
         if keyword in midval or keyword in arr_sorted[mid].nim.lower() or keyword in arr_sorted[mid].jurusan.lower():
-            # collect neighbors that match too
             i = mid
-            while i >= 0 and (keyword in arr_sorted[i].nama.lower() or keyword in arr_sorted[i].nim.lower() or keyword in arr_sorted[i].jurusan.lower()):
+            while i >= 0 and keyword in arr_sorted[i].nama.lower():
                 result.append(arr_sorted[i]); i -= 1
             i = mid+1
-            while i < len(arr_sorted) and (keyword in arr_sorted[i].nama.lower() or keyword in arr_sorted[i].nim.lower() or keyword in arr_sorted[i].jurusan.lower()):
+            while i < len(arr_sorted) and keyword in arr_sorted[i].nama.lower():
                 result.append(arr_sorted[i]); i += 1
             break
         elif keyword < midval:
@@ -136,91 +132,59 @@ def binary_search(arr: List[Mahasiswa], keyword: str):
             left = mid + 1
     return result
 
-# ---------- Sorting algorithms (operate on Python list of Mahasiswa) ----------
-def bubble_sort(arr: List[Mahasiswa], key: str, reverse: bool=False):
-    a = arr[:]  # copy
-    n = len(a)
-    for i in range(n):
-        for j in range(0, n-i-1):
-            v1 = getattr(a[j], key)
-            v2 = getattr(a[j+1], key)
-            if (v1 > v2 and not reverse) or (v1 < v2 and reverse):
+# ---------- Sorting ----------
+def bubble_sort(arr: List[Mahasiswa], key: str, reverse=False):
+    a = arr[:]
+    for i in range(len(a)):
+        for j in range(0, len(a)-i-1):
+            if (getattr(a[j], key) > getattr(a[j+1], key)) ^ reverse:
                 a[j], a[j+1] = a[j+1], a[j]
     return a
 
-def insertion_sort(arr: List[Mahasiswa], key: str, reverse: bool=False):
-    a = arr[:]
-    for i in range(1, len(a)):
-        current = a[i]
-        j = i-1
-        while j >= 0:
-            vj = getattr(a[j], key)
-            vc = getattr(current, key)
-            if (vj > vc and not reverse) or (vj < vc and reverse):
-                a[j+1] = a[j]
-                j -= 1
-            else:
-                break
-        a[j+1] = current
-    return a
-
-def selection_sort(arr: List[Mahasiswa], key: str, reverse: bool=False):
-    a = arr[:]
-    n = len(a)
-    for i in range(n):
-        sel = i
-        for j in range(i+1, n):
-            vj = getattr(a[j], key)
-            vs = getattr(a[sel], key)
-            if (vj < vs and not reverse) or (vj > vs and reverse):
-                sel = j
-        a[i], a[sel] = a[sel], a[i]
-    return a
-
-# helper to pick sorting algorithm
 SORT_ALGS = {
-    "bubble": bubble_sort,
-    "insertion": insertion_sort,
-    "selection": selection_sort
+    "bubble": bubble_sort
 }
 
 # ---------- ROUTES ----------
+
+@app.route("/")
+def home():
+    return render_template("home.html")
+
 @app.route("/login", methods=["GET","POST"])
 def login():
     if request.method == "POST":
-        u = request.form.get("username","").strip()
-        p = request.form.get("password","").strip()
+        u = request.form["username"].strip()
+        p = request.form["password"].strip()
         users = load_users()
         if u in users and check_password_hash(users[u], p):
             session["user"] = u
             return redirect(url_for("index"))
-        else:
-            flash("Username atau password salah.", "error")
-            return redirect(url_for("login"))
+        flash("Login gagal")
     return render_template("login.html")
 
 @app.route("/register", methods=["GET","POST"])
 def register():
     if request.method == "POST":
-        username = request.form["username"].strip()
-        password = request.form["password"].strip()
+        u = request.form["username"].strip()
+        p = request.form["password"].strip()
         users = load_users()
-        if username in users:
-            flash("Username sudah digunakan!", "error")
+        if u in users:
+            flash("Username sudah ada")
             return redirect(url_for("register"))
-        users[username] = generate_password_hash(password)
+        users[u] = generate_password_hash(p)
         save_users(users)
-        flash("Akun berhasil dibuat! Silakan login.", "success")
         return redirect(url_for("login"))
     return render_template("register.html")
+
 
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect(url_for("login"))
 
-# INDEX: search + filter + sort
-@app.route("/")
+# ---------- APLIKASI UTAMA ----------
+@app.route("/index")
 @login_required
 def index():
     data = load_data()
@@ -231,20 +195,15 @@ def index():
     sort_field = request.args.get("sort_field", "nama")
     order = request.args.get("order", "asc")
 
-    # --- FILTER ---
     if jurusan_filter:
         data = [m for m in data if m.jurusan == jurusan_filter]
 
-    # --- SEARCH ---
     if q:
-        if method == "linear":
-            data = search_students(data, q)
-        elif method == "sequential":
+        if method in ["linear", "sequential"]:
             data = search_students(data, q)
         elif method == "binary":
             data = binary_search(data, q)
 
-    # --- SORT ---
     reverse = (order == "desc")
     if sort_alg:
         alg = SORT_ALGS.get(sort_alg)
@@ -253,34 +212,21 @@ def index():
     else:
         data = sorted(data, key=lambda x: getattr(x, sort_field), reverse=reverse)
 
-    # ----------------------------------------------------
-    # --------- HITUNG ESTIMASI TIME COMPLEXITY ----------
-    # ----------------------------------------------------
     complexity_info = ""
 
-    # SEARCH
     if q:
         if method in ["linear", "sequential"]:
-            complexity_info += f"Search: {method.title()} Search → O(n)\n"
+            complexity_info += "Search: Linear Search → O(n)\n"
         elif method == "binary":
             complexity_info += "Search: Binary Search → O(log n)\n"
     else:
         complexity_info += "Search: Tidak digunakan.\n"
 
-    # SORT
     if sort_alg:
-        if sort_alg == "bubble":
-            complexity_info += "Sort: Bubble Sort → O(n²)\n"
-        elif sort_alg == "insertion":
-            complexity_info += "Sort: Insertion Sort → O(n²)\n"
-        elif sort_alg == "selection":
-            complexity_info += "Sort: Selection Sort → O(n²)\n"
+        complexity_info += f"Sort: {sort_alg.title()} Sort → O(n²)\n"
     else:
         complexity_info += "Sort: Python Timsort → O(n log n)\n"
 
-    # ----------------------------------------------------
-    # ---------------------- RETURN -----------------------
-    # ----------------------------------------------------
     return render_template(
         "index.html",
         data=data,
@@ -295,94 +241,109 @@ def index():
     )
 
 
-@app.route("/mahasiswa")
-@login_required
-def mahasiswa_page():
-    data = load_data()
-    return render_template("mahasiswa.html", data=data)
-
-@app.route("/tambah", methods=["GET", "POST"])
-@login_required
-def tambah():
-    if request.method == "POST":
-        nim = request.form["nim"].strip()
-        nama = request.form["nama"].strip()
-        kelas = request.form["kelas"].strip().upper()
-        ipk = request.form["ipk"].strip()
-        jurusan = request.form["jurusan"].strip()
-        validate_input(nim, nama, kelas, ipk, jurusan)
-        data = load_data()
-        # check duplicate nim
-        if any(m.nim == nim for m in data):
-            flash("NIM sudah terdaftar!", "error")
-            return redirect(url_for("tambah"))
-        m = Mahasiswa(nim, nama, kelas, float(ipk), jurusan)
-        data.append(m)
-        save_data(data)
-        flash("Mahasiswa berhasil ditambahkan!", "success")
-        return redirect(url_for('index'))
-    return render_template("tambah.html", jurusan_list=JURUSAN_LIST)
-
-@app.route("/delete/<nim>")
-@login_required
-def delete(nim):
-    data = load_data()
-    new_data = [m for m in data if m.nim != nim]
-    if len(new_data) == len(data):
-        flash("Data tidak ditemukan.", "error")
-    else:
-        save_data(new_data)
-        flash("Data berhasil dihapus.", "info")
-    return redirect(url_for("index"))
-
-@app.route("/edit/<nim>", methods=["GET","POST"])
-@login_required
-def edit(nim):
-    data = load_data()
-    mhs = next((m for m in data if m.nim == nim), None)
-    if not mhs:
-        flash("Data tidak ditemukan.", "error")
-        return redirect(url_for("index"))
-    if request.method == "POST":
-        try:
-            nama = request.form["nama"].strip()
-            kelas = request.form["kelas"].strip().upper()
-            ipk = request.form["ipk"].strip()
-            jurusan = request.form["jurusan"].strip()
-            validate_input(nim, nama, kelas, ipk, jurusan)
-            mhs.nama = nama
-            mhs.kelas = kelas
-            mhs.ipk = float(ipk)
-            mhs.jurusan = jurusan
-            save_data(data)
-            flash("Data berhasil diperbarui.", "info")
-            return redirect(url_for("index"))
-        except Exception as e:
-            flash(str(e), "error")
-            return redirect(url_for("edit", nim=nim))
-    return render_template("edit.html", mhs=mhs, jurusan_list=JURUSAN_LIST)
 
 @app.route("/dashboard")
 @login_required
 def dashboard():
     data = load_data()
     total = len(data)
-    avg_ipk = round(sum([m.ipk for m in data]) / total, 2) if total > 0 else 0
-    per_jurusan = {j: len([m for m in data if m.jurusan == j]) for j in JURUSAN_LIST}
-    return render_template("dashboard.html", total=total, avg_ipk=avg_ipk, per_jurusan=per_jurusan)
+    avg_ipk = round(sum(m.ipk for m in data) / total, 2) if total else 0
 
-@app.route("/api/search")
+    # ===== HITUNG JUMLAH PER JURUSAN =====
+    per_jurusan = {}
+    for m in data:
+        per_jurusan[m.jurusan] = per_jurusan.get(m.jurusan, 0) + 1
+
+    # ===== CARI JURUSAN TERBANYAK =====
+    top_jurusan = "-"
+    if per_jurusan:
+        top_jurusan = max(per_jurusan, key=per_jurusan.get)
+
+    return render_template(
+        "dashboard.html",
+        total=total,
+        avg_ipk=avg_ipk,
+        top_jurusan=top_jurusan,
+        per_jurusan=per_jurusan
+    )
+
+
+
+@app.route("/mahasiswa")
 @login_required
-def api_search():
-    q = request.args.get("q","").strip()
+def mahasiswa_page():
+    return render_template("mahasiswa.html", data=load_data())
+
+@app.route("/tambah", methods=["GET","POST"])
+@login_required
+def tambah():
+    if request.method == "POST":
+        nim = request.form["nim"]
+        nama = request.form["nama"]
+        kelas = request.form["kelas"].upper()
+        ipk = request.form["ipk"]
+        jurusan = request.form["jurusan"]
+        validate_input(nim, nama, kelas, ipk, jurusan)
+        data = load_data()
+        data.append(Mahasiswa(nim, nama, kelas, float(ipk), jurusan))
+        save_data(data)
+        return redirect(url_for("index"))
+    return render_template("tambah.html", jurusan_list=JURUSAN_LIST)
+
+@app.route("/edit/<nim>", methods=["GET", "POST"])
+@login_required
+def edit(nim):
     data = load_data()
-    found = search_students(data, q) if q else data
-    return jsonify([m.to_dict() for m in found])
+    mhs = next((m for m in data if m.nim == nim), None)
+
+    if not mhs:
+        flash("Data mahasiswa tidak ditemukan")
+        return redirect(url_for("index"))
+
+    if request.method == "POST":
+        nama = request.form["nama"]
+        kelas = request.form["kelas"].upper()
+        ipk = request.form["ipk"]
+        jurusan = request.form["jurusan"]
+
+        validate_input(nim, nama, kelas, ipk, jurusan)
+
+        mhs.nama = nama
+        mhs.kelas = kelas
+        mhs.ipk = float(ipk)
+        mhs.jurusan = jurusan
+
+        save_data(data)
+        return redirect(url_for("index"))
+
+    return render_template(
+    "edit.html",
+    mhs=mhs,
+    jurusan_list=JURUSAN_LIST
+)
+
+
+    
+@app.route("/delete/<nim>")
+@login_required
+def delete(nim):
+    data = load_data()
+    data_baru = [m for m in data if m.nim != nim]
+
+    if len(data) == len(data_baru):
+        flash("Data mahasiswa tidak ditemukan", "error")
+    else:
+        save_data(data_baru)
+        flash("Data mahasiswa berhasil dihapus", "success")
+
+    return redirect(url_for("index"))
+    
+
 
 # ---------- RUN ----------
 if __name__ == "__main__":
     if not os.path.exists(DATA_FILE):
-        with open(DATA_FILE, "w", encoding="utf-8") as f:
+        with open(DATA_FILE, "w") as f:
             json.dump([], f)
     if not os.path.exists(USERS_FILE):
         save_users({"admin": generate_password_hash("12345")})

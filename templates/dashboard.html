@@ -1,64 +1,60 @@
-{% extends "base.html" %}
-
+{% extends 'base.html' %}
 {% block content %}
 
-<h2 style="text-align:center; margin-bottom:30px;">📊 Dashboard Statistik</h2>
 
-<div class="stats" style="display:flex; gap:20px; flex-wrap:wrap; justify-content:center;">
+<h2 style="margin-bottom:20px">📊 Dashboard Mahasiswa</h2>
 
-    <!-- Total Mahasiswa -->
-    <div class="stat-card" style="flex:1; min-width:200px; background: linear-gradient(135deg, #6a11cb, #2575fc); color:white; padding:20px; border-radius:15px; box-shadow:0 5px 20px rgba(0,0,0,0.2); transition: transform 0.3s;">
-        <div style="font-size:30px; margin-bottom:10px;">👨‍🎓</div>
-        <div class="stat-title">Total Mahasiswa</div>
-        <div class="stat-value" style="font-size:2em; font-weight:bold;">{{ total }}</div>
+
+<!-- STAT CARDS -->
+<div class="stats">
+    <div class="stat-card blue">
+        <div class="stat-title">Jumlah Mahasiswa</div>
+        <div class="stat-value">{{ total }}</div>
     </div>
 
-    <!-- Rata-rata IPK -->
-    <div class="stat-card" style="flex:1; min-width:200px; background: linear-gradient(135deg, #ff416c, #ff4b2b); color:white; padding:20px; border-radius:15px; box-shadow:0 5px 20px rgba(0,0,0,0.2); transition: transform 0.3s;">
-        <div style="font-size:30px; margin-bottom:10px;">🎓</div>
+    <div class="stat-card green">
         <div class="stat-title">Rata-rata IPK</div>
-        <div class="stat-value" style="font-size:2em; font-weight:bold;">{{ avg_ipk }}</div>
+        <div class="stat-value">{{ avg_ipk }}</div>
     </div>
 
+    <div class="stat-card purple">
+        <div class="stat-title">Jurusan Terbanyak</div>
+        <div class="stat-value">{{ top_jurusan }}</div>
+    </div>
 </div>
 
-<h3 style="margin-top:40px; text-align:center;">📚 Jumlah Mahasiswa per Jurusan</h3>
-<table style="width:100%; margin-top:15px; border-collapse:collapse; text-align:left;">
-    <thead>
-        <tr style="background:#3949ab; color:white;">
-            <th style="padding:12px; border-radius:10px 0 0 10px;">Jurusan</th>
-            <th style="padding:12px; border-radius:0 10px 10px 0;">Jumlah</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for j, n in per_jurusan.items() %}
-        <tr style="background:#f0f4ff; transition:0.3s;">
-            <td style="padding:12px;">🎓 {{ j }}</td>
-            <td style="padding:12px; font-weight:bold;">{{ n }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
 
-<style>
-/* Hover effect pada stat-card */
-.stat-card:hover {
-    transform: translateY(-8px) scale(1.05);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-}
+<!-- CHART SECTION -->
+<div class="chart-wrapper">
+<h3>Distribusi Mahasiswa per Jurusan</h3>
+<canvas id="jurusanChart" height="120"></canvas>
+</div>
 
-/* Hover effect pada baris table */
-tbody tr:hover {
-    background: #d1d9ff;
-}
 
-/* Responsive untuk mobile */
-@media(max-width:768px){
-    .stats {
-        flex-direction: column;
-        align-items: center;
-    }
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('jurusanChart');
+new Chart(ctx, {
+type: 'bar',
+data: {
+labels: {{ per_jurusan.keys()|list|tojson }},
+datasets: [{
+label: 'Jumlah Mahasiswa',
+data: {{ per_jurusan.values()|list|tojson }},
+borderWidth: 2
+}]
+},
+options: {
+responsive: true,
+plugins: {
+legend: { display:false }
+},
+scales: {
+y: { beginAtZero:true }
 }
-</style>
+}
+});
+</script>
+
 
 {% endblock %}

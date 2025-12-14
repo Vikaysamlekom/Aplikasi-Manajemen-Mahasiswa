@@ -1,29 +1,20 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% block content %}
+<h2 class="page-title">✏️ Edit Mahasiswa</h2>
+
 
 <div class="form-wrapper">
-    <h2>Edit Mahasiswa {{ mhs.nim }}</h2>
-
-    <form method="post">
-        <label>Nama</label>
-        <input type="text" name="nama" value="{{ mhs.nama }}" required>
-
-        <label>Kelas</label>
-        <input type="text" name="kelas" value="{{ mhs.kelas }}" required>
-
-        <label>IPK</label>
-        <input type="number" step="0.01" name="ipk" value="{{ '%.2f' % mhs.ipk }}" required>
-
-        <label>Jurusan</label>
-        <select name="jurusan" required>
-            {% for j in jurusan_list %}
-            <option value="{{ j }}" {% if mhs.jurusan==j %}selected{% endif %}>{{ j }}</option>
-            {% endfor %}
-        </select>
-
-        <button class="btn" type="submit">Simpan</button>
-        <a class="btn-kembali" href="{{ url_for('index') }}">Batal</a>
-    </form>
+<form method="post">
+<label>Nama</label><input name="nama" value="{{ mhs.nama }}" required />
+<label>Kelas</label><input name="kelas" value="{{ mhs.kelas }}" required />
+<label>IPK</label><input name="ipk" value="{{ mhs.ipk }}" required />
+<label>Jurusan</label>
+<select name="jurusan">
+{% for j in jurusan_list %}
+<option {% if j==mhs.jurusan %}selected{% endif %}>{{ j }}</option>
+{% endfor %}
+</select>
+<button class="btn">Update</button>
+</form>
 </div>
-
 {% endblock %}

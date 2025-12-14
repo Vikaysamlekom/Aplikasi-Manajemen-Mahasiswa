@@ -368,3 +368,21 @@ body.dark td {
 .btn-delete { background: var(--danger); }
 .btn-delete:hover { background: #c0392b; }
 
+/* ===== FORCE TEXT WHITE ON DASHBOARD CARDS ===== */
+.stat-card,
+.stat-card * {
+    color: #ffffff !important;
+}
+
+/* Title sedikit transparan biar elegan */
+.stat-card .stat-title {
+    opacity: 0.85;
+    font-weight: 500;
+}
+
+/* Angka utama lebih tegas */
+.stat-card .stat-value {
+    font-size: 2.3em;
+    font-weight: 700;
+    margin-top: 6px;
+}

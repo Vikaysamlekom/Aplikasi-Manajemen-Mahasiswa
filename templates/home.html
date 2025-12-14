@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistem Manajemen Mahasiswa</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <div class="logo">SIMMA</div>
+    <div class="nav-links">
+        <a href="{{ url_for('login') }}" class="btn-outline">Login</a>
+        <a href="{{ url_for('register') }}" class="btn-solid">Register</a>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-content">
+        <h1>Sistem Manajemen Mahasiswa</h1>
+        <p>
+            Aplikasi modern untuk mengelola data mahasiswa  
+            dengan fitur <b>Search, Sorting Algorithm</b>  
+            dan <b>Analisis Time Complexity</b>.
+        </p>
+
+        <div class="hero-buttons">
+            <a href="{{ url_for('login') }}" class="btn-primary">Mulai Sekarang</a>
+            <a href="#features" class="btn-secondary">Pelajari Fitur</a>
+        </div>
+    </div>
+
+    <div class="hero-image">
+        <div class="glass-card">
+            <h3>Fitur Unggulan</h3>
+            <ul>
+                <li>✔ Linear, Binary, Sequential Search</li>
+                <li>✔ Bubble, Insertion, Selection Sort</li>
+                <li>✔ Estimasi Time Complexity</li>
+                <li>✔ Login & Register Aman</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" class="features">
+    <h2>Kenapa SIMMA?</h2>
+
+    <div class="feature-grid">
+        <div class="feature-card">
+            <h3>Modern UI</h3>
+            <p>Tampilan premium, responsif, dan nyaman digunakan.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Algoritma Nyata</h3>
+            <p>Menggunakan algoritma sorting & searching asli.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Time Complexity</h3>
+            <p>Estimasi Big-O langsung ditampilkan.</p>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <p>© 2025 Sistem Manajemen Mahasiswa</p>
+</footer>
+
+</body>
+</html>
